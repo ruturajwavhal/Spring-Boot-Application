@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Excel Data</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        table { width: 80%; border-collapse: collapse; margin: 20px auto; background: white; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background: #4CAF50; color: white; }
+        form { text-align: center; margin-bottom: 20px; }
+        select, button { padding: 8px; margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+<h2 style="text-align:center;">Excel Data from Controller</h2>
+
+<form method="get" th:action="@{/excel/read/all}">
+    <label>Filter by Category:</label>
+    <select name="category">
+        <option value="">-- All --</option>
+        <option value="Admin" th:selected="${selectedCategory == 'Admin'}">Admin</option>
+        <option value="Finance" th:selected="${selectedCategory == 'Finance'}">Finance</option>
+        <option value="HR" th:selected="${selectedCategory == 'HR'}">HR</option>
+        <option value="IT" th:selected="${selectedCategory == 'IT'}">Finance</option>
+        <option value="Marketing" th:selected="${selectedCategory == 'Marketing'}">Marketing</option>
+    </select>
+    <button type="submit">Filter</button>
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Role</th>
+        <th>Name</th>
+        <th>Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="entry : ${dataMap}">
+        <td th:text="${entry.key}"></td>
+        <td th:text="${entry.value[0]}"></td>
+        <td th:text="${entry.value[1]}"></td>
+        <td th:text="${entry.value[2]}"></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -31,8 +31,6 @@ public class ReadExcel {
 
         for (int i = 1; i < rowCount; i++) {
             Row row = sheet.getRow(i);
-
-
             List<String> rowData = new ArrayList<>();
             int key = 0;
             int cellCount = row.getPhysicalNumberOfCells();
