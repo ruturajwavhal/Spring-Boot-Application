@@ -14,6 +14,8 @@ import java.util.Map;
 
 @Component
 public class ReadExcel {
+
+    //Read all excelsheet data and converts it into map where id is key and remaining columns are values
     public static void readExcel() throws IOException {
         FileInputStream file = new FileInputStream(new File("D:\\demo.xlsx"));
         Workbook workbook = new XSSFWorkbook(file);

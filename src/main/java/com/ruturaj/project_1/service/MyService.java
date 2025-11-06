@@ -16,44 +16,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class MyService {
-    public  Map<Integer, List<String>> readExcel() throws IOException {
-        FileInputStream file = new FileInputStream(new File("D:\\demo.xlsx"));
-        Workbook workbook = new XSSFWorkbook(file);
-        Sheet sheet = workbook.getSheetAt(0);
-
-        Map<Integer, List<String>> data = new HashMap<>();
-
-        int rowCount = sheet.getPhysicalNumberOfRows();
-
-        for (int i = 1; i < rowCount; i++) {
-            Row row = sheet.getRow(i);
-            if (row == null)
-                continue; // skip empty rows
-
-            List<String> rowData = new ArrayList<>();
-            int key = 0;
-            int cellCount = row.getPhysicalNumberOfCells();
-
-            for (int j = 0; j < cellCount; j++) {
-                Cell cell = row.getCell(j);
-                if(j==2) {
-                    key = (int) Double.parseDouble(cell.toString());
-                }
-                else {
-                    if (cell == null) {
-                        rowData.add(""); // handle empty cell
-                    }
-                    else {
-                        rowData.add(cell.toString());
-                    }
-                }
-            }
-            data.put(key , rowData); // uncomment if you need to store
-        }
-        System.out.println(data);
-        DataKepper.data = data;
-        return data;
-    }
 
     public Map<Integer, List<String>> getByCategory(Map<Integer, List<String>> data, String categoryName) {
         return data.entrySet().stream()
@@ -73,6 +35,7 @@ public class MyService {
                 ));
         return sortedMap;
     }
+
     public Map<Integer, List<String>> getFilterByCategoryNullValues(Map<Integer, List<String>> data, String category) {
         Map<Integer, List<String>> sortedMap = data.entrySet().stream()
                 .filter(entry -> {
