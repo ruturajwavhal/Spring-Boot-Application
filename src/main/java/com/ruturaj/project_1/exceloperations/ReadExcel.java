@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,8 +18,11 @@ public class ReadExcel {
 
     //Read all excelsheet data and converts it into map where id is key and remaining columns are values
     public static void readExcel() throws IOException {
-        FileInputStream file = new FileInputStream(new File("D:\\demo.xlsx"));
-        Workbook workbook = new XSSFWorkbook(file);
+        InputStream inputStream = ReadExcel.class.getResourceAsStream("/demo.xlsx");
+        if (inputStream == null) {
+            throw new RuntimeException("demo.xlsx not found in resources folder!");
+        }
+        Workbook workbook = new XSSFWorkbook(inputStream);
         Sheet sheet = workbook.getSheetAt(0);
 
         Map<Integer, List<String>> data = new HashMap<>();
