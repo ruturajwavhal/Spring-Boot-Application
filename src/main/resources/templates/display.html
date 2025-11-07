@@ -26,7 +26,12 @@
         <option value="IT" th:selected="${selectedCategory == 'IT'}">Finance</option>
         <option value="Marketing" th:selected="${selectedCategory == 'Marketing'}">Marketing</option>
     </select>
-    <button type="submit">Filter</button>
+<!--    <button type="submit">Filter</button>-->
+    <label style="margin-left: 10px;">Search by Name/DOB:</label>
+    <input type="text" name="search" style="margin-left: 10px;" placeholder="Enter value... " th:value="${searchText}">
+
+    <button type="submit">Search</button>
+
 </form>
 
 <table>
