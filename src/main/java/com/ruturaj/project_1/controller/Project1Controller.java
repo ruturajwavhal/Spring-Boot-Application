@@ -29,6 +29,7 @@ public class Project1Controller {
     @GetMapping("/read/all")
     public String readAllExcelData(
             @RequestParam(required = false) String category,
+            @RequestParam(required = false) String search,
             Model model) {
 
         Map<Integer, List<String>> dataMap = DataKepper.data;
@@ -40,8 +41,18 @@ public class Project1Controller {
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
 
+        if (search != null && !search.isEmpty()) {
+            String searchLower = search.toLowerCase();
+            dataMap = dataMap.entrySet().stream()
+                    .filter(entry -> entry.getValue().stream()
+                            .anyMatch(value -> value != null && value.toLowerCase().contains(searchLower)))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
+
         model.addAttribute("dataMap", dataMap);
         model.addAttribute("selectedCategory", category);
+        model.addAttribute("searchText", search);
+
 
         return "display";
     }
