@@ -57,6 +57,32 @@ public class Project1Controller {
         return "display";
     }
 
+    @GetMapping("/search")
+    @ResponseBody
+    public Map<Integer, List<String>> searchExcelData(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String search) {
+
+        Map<Integer, List<String>> dataMap = DataKepper.data;
+
+        // Filter by category if provided
+        if (category != null && !category.isEmpty()) {
+            dataMap = dataMap.entrySet().stream()
+                    .filter(entry -> entry.getValue().get(0).equalsIgnoreCase(category))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
+
+        // Filter by search text
+        if (search != null && !search.isEmpty()) {
+            String searchLower = search.toLowerCase();
+            dataMap = dataMap.entrySet().stream()
+                    .filter(entry -> entry.getValue().stream()
+                            .anyMatch(value -> value != null && value.toLowerCase().contains(searchLower)))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
+
+        return dataMap;
+    }
 //    @GetMapping("/read/{category}")
 //    public Map<Integer, List<String>> readByCategory(@PathVariable String category) {
 //        return myService.getByCategory(DataKepper.data, category);
