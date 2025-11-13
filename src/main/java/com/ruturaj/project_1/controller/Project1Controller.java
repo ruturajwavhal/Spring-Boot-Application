@@ -7,22 +7,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
-
 
 @Controller
 @RequestMapping("/excel")
 public class Project1Controller {
 
-    Map<Integer, List<String>> data = new HashMap<>();
     private final MyService myService;
+
     @Autowired
-    public Project1Controller(MyService myService)
-    {
+    public Project1Controller(MyService myService) {
         this.myService = myService;
     }
 
@@ -33,7 +28,6 @@ public class Project1Controller {
             Model model) {
 
         Map<Integer, List<String>> dataMap = DataKepper.data;
-
 
         if (category != null && !category.isEmpty()) {
             dataMap = dataMap.entrySet().stream()
@@ -49,10 +43,19 @@ public class Project1Controller {
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
 
+        // Optional: sort by ID
+        dataMap = dataMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                ));
+
         model.addAttribute("dataMap", dataMap);
         model.addAttribute("selectedCategory", category);
         model.addAttribute("searchText", search);
-
 
         return "display";
     }
@@ -65,14 +68,12 @@ public class Project1Controller {
 
         Map<Integer, List<String>> dataMap = DataKepper.data;
 
-        // Filter by category if provided
         if (category != null && !category.isEmpty()) {
             dataMap = dataMap.entrySet().stream()
                     .filter(entry -> entry.getValue().get(0).equalsIgnoreCase(category))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
 
-        // Filter by search text
         if (search != null && !search.isEmpty()) {
             String searchLower = search.toLowerCase();
             dataMap = dataMap.entrySet().stream()
@@ -83,19 +84,4 @@ public class Project1Controller {
 
         return dataMap;
     }
-//    @GetMapping("/read/{category}")
-//    public Map<Integer, List<String>> readByCategory(@PathVariable String category) {
-//        return myService.getByCategory(DataKepper.data, category);
-//    }
-//
-//    @GetMapping("/filter/null")
-//    public Map<Integer, List<String>> filterByNullValues() {
-//        return myService.getFilterByNullValues(DataKepper.data);
-//    }
-//
-//    @GetMapping("/filter/{category}/null")
-//    public Map<Integer, List<String>> filterByCategoryNullValues(@PathVariable String category) {
-//        return myService.getFilterByCategoryNullValues(DataKepper.data, category);
-//    }
-
 }

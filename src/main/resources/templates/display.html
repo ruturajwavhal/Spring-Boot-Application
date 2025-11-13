@@ -1,44 +1,55 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Excel Data</title>
+    <title th:text="#{page.title}">Excel Data</title>
     <style>
         body { font-family: Arial; padding: 20px; background: #f5f5f5; }
         table { width: 80%; border-collapse: collapse; margin: 20px auto; background: white; }
         th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
         th { background: #4CAF50; color: white; }
         form { text-align: center; margin-bottom: 20px; }
-        select, button { padding: 8px; margin-left: 5px; }
+        select, input[type="text"], button {
+            padding: 8px; margin-left: 5px;
+        }
     </style>
 </head>
 <body>
 
-<h2 style="text-align:center;">Excel Data</h2>
+<h2 style="text-align:center;" th:text="#{page.title}">Excel Data</h2>
 
-<form id="filterForm" method="get" th:action="@{/excel/read/all}">
-    <label>Filter by Category:</label>
+<form id="filterForm" method="get">
+    <label th:text="#{label.category}">Filter by Category:</label>
     <select id="category" name="category">
         <option value="">-- All --</option>
         <option value="Admin" th:selected="${selectedCategory == 'Admin'}">Admin</option>
         <option value="Finance" th:selected="${selectedCategory == 'Finance'}">Finance</option>
         <option value="HR" th:selected="${selectedCategory == 'HR'}">HR</option>
-        <option value="IT" th:selected="${selectedCategory == 'IT'}">Finance</option>
+        <option value="IT" th:selected="${selectedCategory == 'IT'}">IT</option>
         <option value="Marketing" th:selected="${selectedCategory == 'Marketing'}">Marketing</option>
     </select>
-<!--    <button type="submit">Filter</button>-->
-    <label style="margin-left: 10px;">Search:</label>
+
+    <label style="margin-left: 10px;" th:text="#{label.search}">Search:</label>
     <input type="text" id="searchBox" name="search" placeholder="Type to search..." th:value="${searchText}">
+
+    <!-- Language Selector -->
+    <select id="languageSelect">
+        <option value="en" th:selected="${#locale.language == 'en'}">English</option>
+        <option value="hi" th:selected="${#locale.language == 'hi'}">हिंदी</option>
+        <option value="mr" th:selected="${#locale.language == 'mr'}">मराठी</option>
+        <option value="de" th:selected="${#locale.language == 'de'}">Deutsch</option>
+        <option value="fr" th:selected="${#locale.language == 'fr'}">Français</option>
+    </select>
 
 </form>
 
 <table>
     <thead>
     <tr>
-        <th>ID</th>
-        <th>Role</th>
-        <th>Name</th>
-        <th>Date</th>
+        <th th:text="#{label.id}">ID</th>
+        <th th:text="#{label.role}">Role</th>
+        <th th:text="#{label.name}">Name</th>
+        <th th:text="#{label.date}">Date</th>
     </tr>
     </thead>
     <tbody id="dataBody">
@@ -54,25 +65,25 @@
 <script>
     const searchBox = document.getElementById("searchBox");
     const categorySelect = document.getElementById("category");
+    const languageSelect = document.getElementById("languageSelect");
     const dataBody = document.getElementById("dataBody");
 
+    // Function to fetch and update table data
     function fetchFilteredData() {
         const search = searchBox.value.trim();
         const category = categorySelect.value;
+        const lang = languageSelect.value;
 
-        fetch(`/excel/search?search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}`)
+        fetch(`/excel/search?search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}&lang=${encodeURIComponent(lang)}`)
             .then(response => response.json())
             .then(data => {
-                // Clear old rows
                 dataBody.innerHTML = "";
 
-                // If empty, show message
                 if (Object.keys(data).length === 0) {
-                    dataBody.innerHTML = `<tr><td colspan="4">No matching records found</td></tr>`;
+                    dataBody.innerHTML = `<tr><td colspan="4">${getLocalizedMessage("label.noData")}</td></tr>`;
                     return;
                 }
 
-                // Append new rows
                 for (const [key, values] of Object.entries(data)) {
                     const row = `<tr>
                         <td>${key}</td>
@@ -86,11 +97,18 @@
             .catch(error => console.error('Error fetching data:', error));
     }
 
-    // Listen for typing
+    // Event: live search and category filter
     searchBox.addEventListener("keyup", fetchFilteredData);
-
-    // Also listen for category change
     categorySelect.addEventListener("change", fetchFilteredData);
+
+    // Event: language change (reloads page)
+    languageSelect.addEventListener("change", () => {
+        const lang = languageSelect.value;
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set("lang", lang);
+        window.location.href = currentUrl.toString();
+    });
+
 </script>
 </body>
 </html>
